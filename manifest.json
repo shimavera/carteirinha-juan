@@ -1,0 +1,19 @@
+{
+  "name": "Carteirinha Juan",
+  "short_name": "Carteirinha",
+  "description": "Carteirinha digital de meia passagem",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#6D28D9",
+  "theme_color": "#6D28D9",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "utilities"]
+}

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#6D28D9">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Carteirinha">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>Carteirinha Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple:        #6D28D9;
+      --purple-dark:   #4C1D95;
+      --purple-light:  #8B5CF6;
+      --blue:          #1D4ED8;
+      --blue-dark:     #1E3A8A;
+      --bg:            #F1F5F9;
+      --bg2:           #E2E8F0;
+      --white:         #FFFFFF;
+      --text:          #0F172A;
+      --text-2:        #64748B;
+      --text-3:        #94A3B8;
+      --border:        #E2E8F0;
+      --green:         #10B981;
+      --shadow-sm:     0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:     0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+      --radius-sm:     12px;
+      --radius-md:     18px;
+      --radius-lg:     24px;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #CBD5E1;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    #app {
+      position: relative;
+      width: 100%;
+      max-width: 430px;
+      height: 100%;
+      height: 100dvh;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--bg);
+      box-shadow: 0 0 60px rgba(0,0,0,0.2);
+    }
+
+    /* ── SCREENS ── */
+    .screen {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      will-change: transform;
+      transition: transform 0.38s cubic-bezier(0.4, 0.0, 0.2, 1);
+      background: var(--bg);
+    }
+    .screen::-webkit-scrollbar { display: none; }
+
+    #screen-home { transform: translateX(0); }
+    #screen-card { transform: translateX(100%); }
+
+    #screen-home.slide-out { transform: translateX(-28%); }
+    #screen-card.slide-in  { transform: translateX(0); }
+
+    /* ── SAFE AREA UTILS ── */
+    .safe-top    { padding-top: env(safe-area-inset-top, 0px); }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+    /* ══════════════════════════════════════
+       HOME SCREEN
+    ══════════════════════════════════════ */
+
+    .home-wrap {
+      padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Status / header */
+    .home-header {
+      padding: calc(env(safe-area-inset-top, 14px) + 14px) 22px 0;
+    }
+
+    .location-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+
+    .location-row .dot {
+      width: 6px; height: 6px;
+      background: var(--purple);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .location-row span {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-2);
+      flex: 1;
+    }
+
+    .location-row .chevron {
+      color: var(--text-3);
+    }
+
+    .home-title {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    /* Banner */
+    .banner {
+      margin: 0 22px 20px;
+      background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 8px 24px rgba(109,40,217,0.35);
+    }
+
+    .banner:active { transform: scale(0.98); }
+
+    .banner-bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+    }
+    .banner-bubble.b1 { width: 110px; height: 110px; top: -30px; right: -20px; }
+    .banner-bubble.b2 { width: 70px;  height: 70px;  bottom: -25px; right: 60px; }
+
+    .banner-left h3 {
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.3px;
+      margin-bottom: 3px;
+    }
+    .banner-left p {
+      font-size: 12.5px;
+      color: rgba(255,255,255,0.72);
+      font-weight: 500;
+    }
+
+    .banner-icon-wrap {
+      width: 48px; height: 48px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Grid */
+    .grid-section {
+      padding: 0 22px;
+      margin-bottom: 14px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .tile {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 18px 16px 16px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      min-height: 118px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s, box-shadow 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      border: 1px solid rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tile:active {
+      transform: scale(0.96);
+      box-shadow: none;
+    }
+
+    .tile.purple {
+      background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+      border-color: transparent;
+      box-shadow: 0 6px 20px rgba(109,40,217,0.3);
+    }
+    .tile.purple .tile-label { color: #fff; }
+    .tile.purple .tile-icon  { color: rgba(255,255,255,0.85); }
+
+    .tile.tall { grid-row: span 1; min-height: 118px; }
+
+    .tile-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .tile-icon {
+      align-self: flex-end;
+      color: var(--purple);
+      opacity: 0.9;
+    }
+
+    /* Bottom CTA */
+    .bottom-cta {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      padding: 10px 22px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      background: rgba(241, 245, 249, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      z-index: 20;
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 17px 22px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.15s, transform 0.15s;
+      box-shadow: 0 4px 14px rgba(109,40,217,0.4);
+      letter-spacing: -0.2px;
+    }
+    .btn-primary:active { opacity: 0.85; transform: scale(0.98); }
+
+    /* ══════════════════════════════════════
+       CARD SCREEN
+    ══════════════════════════════════════ */
+
+    .card-wrap {
+      padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .card-header {
+      padding: calc(env(safe-area-inset-top, 14px) + 14px) 22px 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 6px;
+    }
+
+    .btn-back {
+      width: 40px; height: 40px;
+      border: none;
+      background: var(--white);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+      border: 1px solid var(--border);
+      transition: transform 0.15s;
+    }
+    .btn-back:active { transform: scale(0.9); }
+
+    .card-header-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    .card-body {
+      padding: 16px 22px 0;
+    }
+
+    .instruction {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .instruction strong { color: var(--text); font-weight: 700; }
+
+    /* QR Box */
+    .qr-box {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 16px;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .qr-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    #qrcode {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 200px;
+    }
+
+    #qrcode canvas,
+    #qrcode img {
+      border-radius: 10px;
+      display: block;
+    }
+
+    .qr-loading {
+      width: 200px; height: 200px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+
+    /* Student Card */
+    .student-card {
+      background: linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 65%, #172554 100%);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 28px rgba(29,78,216,0.4);
+    }
+
+    .sc-orb {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .sc-orb.o1 { width: 150px; height: 150px; top: -50px; right: -40px; }
+    .sc-orb.o2 { width: 100px; height: 100px; bottom: -40px; left: 10px; }
+
+    .sc-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .sc-avatar {
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      border: 2.5px solid rgba(255,255,255,0.45);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+
+    .sc-institution {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 7px 11px;
+      font-size: 10.5px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.92);
+      text-align: right;
+      max-width: 150px;
+      line-height: 1.4;
+      letter-spacing: 0.2px;
+    }
+
+    .sc-body { position: relative; }
+
+    .meia-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 20px;
+      padding: 4px 11px;
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.88);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 10px;
+    }
+
+    .sc-name {
+      font-size: 19px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+      margin-bottom: 5px;
+    }
+
+    .sc-course {
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .sc-ra {
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      font-weight: 500;
+    }
+    .sc-ra strong {
+      color: rgba(255,255,255,0.82);
+      font-weight: 700;
+    }
+
+    /* Validity strip */
+    .validity-strip {
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+
+    .validity-left { display: flex; flex-direction: column; gap: 2px; }
+    .validity-label { font-size: 11px; font-weight: 600; color: var(--text-3); }
+    .validity-value { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+
+    .validity-right {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 13px; font-weight: 700; color: var(--green);
+    }
+
+    .pulse-dot {
+      width: 9px; height: 9px;
+      background: var(--green);
+      border-radius: 50%;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.75); }
+    }
+    .pulse-dot { animation: pulse 2.2s ease-in-out infinite; }
+
+    /* ── MISC ── */
+    button { font-family: inherit; }
+
+    /* Remove tap highlight everywhere */
+    * { -webkit-tap-highlight-color: transparent; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ╔══════════════════════════════════╗
+       ║         HOME SCREEN             ║
+       ╚══════════════════════════════════╝ -->
+  <div class="screen" id="screen-home">
+    <div class="home-wrap">
+      <div class="home-header">
+        <div class="location-row">
+          <div class="dot"></div>
+          <span id="txt-institution-loc">Instituição de Ensino</span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+        <h1 class="home-title">Acessos rápidos</h1>
+      </div>
+
+      <!-- Banner -->
+      <div class="banner" id="btn-banner">
+        <div class="banner-bubble b1"></div>
+        <div class="banner-bubble b2"></div>
+        <div class="banner-left">
+          <h3>Carteirinha Digital</h3>
+          <p>Acessar minha carteirinha →</p>
+        </div>
+        <div class="banner-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="5" width="20" height="14" rx="3"/>
+            <circle cx="8.5" cy="11" r="2"/>
+            <path d="M14 10h4M14 13h3"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="grid-section">
+        <div class="section-label">Acesso rápido</div>
+        <div class="grid">
+
+          <div class="tile purple" id="btn-tile-card">
+            <span class="tile-label">Minha Carteirinha</span>
+            <div class="tile-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="3"/>
+                <circle cx="8.5" cy="11" r="2"/>
+                <path d="M14 10h4M14 13h3"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="tile">
+            <span class="tile-label">Histórico de Uso</span>
+            <div class="tile-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="tile">
+            <span class="tile-label">Configurações</span>
+            <div class="tile-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="tile">
+            <span class="tile-label">Sobre o App</span>
+            <div class="tile-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /home-wrap -->
+
+    <!-- Bottom CTA -->
+    <div class="bottom-cta">
+      <button class="btn-primary" id="btn-cta">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="3"/>
+          <circle cx="8.5" cy="11" r="2"/>
+          <path d="M14 10h4M14 13h3"/>
+        </svg>
+        Minha Carteirinha
+      </button>
+    </div>
+  </div><!-- /screen-home -->
+
+
+  <!-- ╔══════════════════════════════════╗
+       ║       CARTEIRINHA SCREEN        ║
+       ╚══════════════════════════════════╝ -->
+  <div class="screen" id="screen-card">
+    <div class="card-wrap">
+      <div class="card-header">
+        <button class="btn-back" id="btn-back">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <h2 class="card-header-title">Minha Carteirinha</h2>
+      </div>
+
+      <div class="card-body">
+        <p class="instruction">
+          Apresente esse QR Code ao cobrador ou leitor para utilizar a <strong>meia passagem</strong>.
+        </p>
+
+        <!-- QR Code -->
+        <div class="qr-box">
+          <div class="qr-label">QR Code — Meia Passagem</div>
+          <div id="qrcode">
+            <div class="qr-loading">Gerando QR Code…</div>
+          </div>
+        </div>
+
+        <!-- Student Card -->
+        <div class="student-card">
+          <div class="sc-orb o1"></div>
+          <div class="sc-orb o2"></div>
+          <div class="sc-top">
+            <div class="sc-avatar" id="sc-initials">JL</div>
+            <div class="sc-institution" id="sc-institution">INSTITUIÇÃO<br>DE ENSINO</div>
+          </div>
+          <div class="sc-body">
+            <div class="meia-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Meia Passagem
+            </div>
+            <div class="sc-name" id="sc-name">Juan Lourenco</div>
+            <div class="sc-course" id="sc-course">Curso</div>
+            <div class="sc-ra">Matrícula <strong id="sc-ra">000000</strong></div>
+          </div>
+        </div>
+
+        <!-- Validity -->
+        <div class="validity-strip">
+          <div class="validity-left">
+            <span class="validity-label">Validade</span>
+            <span class="validity-value" id="sc-validity">12/2025</span>
+          </div>
+          <div class="validity-right">
+            <div class="pulse-dot"></div>
+            Válida
+          </div>
+        </div>
+      </div>
+    </div><!-- /card-wrap -->
+  </div><!-- /screen-card -->
+
+</div><!-- /app -->
+
+<script>
+// ============================================================
+//  CONFIGURAÇÕES — edite estas constantes para personalizar
+// ============================================================
+const STUDENT = {
+  name:        'Juan Lourenco',
+  course:      'Administração',             // <- seu curso
+  ra:          '2024001234',                // <- seu RA / matrícula
+  institution: 'Universidade Anhembi',      // <- nome da instituição
+  validity:    '12/2025',                   // <- validade (MM/AAAA)
+  qrData:      'MEIA:2024001234:JUAN.LOURENCO:SP:2025', // <- dados do QR
+};
+// ============================================================
+
+// Preencher dados na UI
+document.getElementById('txt-institution-loc').textContent = STUDENT.institution;
+document.getElementById('sc-institution').innerHTML      = STUDENT.institution.replace(' ', '<br>');
+document.getElementById('sc-name').textContent           = STUDENT.name;
+document.getElementById('sc-course').textContent         = STUDENT.course;
+document.getElementById('sc-ra').textContent             = STUDENT.ra;
+document.getElementById('sc-validity').textContent       = STUDENT.validity;
+
+// Iniciais do avatar
+const parts    = STUDENT.name.trim().split(' ').filter(Boolean);
+const initials = parts.length >= 2
+  ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  : parts[0].substring(0, 2).toUpperCase();
+document.getElementById('sc-initials').textContent = initials;
+
+// ── Navegação entre telas ──────────────────────────────────
+const homeScreen = document.getElementById('screen-home');
+const cardScreen = document.getElementById('screen-card');
+let qrGenerated  = false;
+
+function showCard() {
+  homeScreen.classList.add('slide-out');
+  cardScreen.classList.add('slide-in');
+  if (!qrGenerated) { generateQR(); qrGenerated = true; }
+}
+
+function showHome() {
+  cardScreen.classList.remove('slide-in');
+  homeScreen.classList.remove('slide-out');
+}
+
+document.getElementById('btn-banner').addEventListener('click', showCard);
+document.getElementById('btn-tile-card').addEventListener('click', showCard);
+document.getElementById('btn-cta').addEventListener('click', showCard);
+document.getElementById('btn-back').addEventListener('click', showHome);
+
+// ── Gerar QR Code ──────────────────────────────────────────
+function generateQR() {
+  const el   = document.getElementById('qrcode');
+  el.innerHTML = '';
+  const size = Math.min(window.innerWidth - 88, 240);
+  /* global QRCode */
+  new QRCode(el, {
+    text:           STUDENT.qrData,
+    width:          size,
+    height:         size,
+    colorDark:      '#0F172A',
+    colorLight:     '#FFFFFF',
+    correctLevel:   QRCode.CorrectLevel.H,
+  });
+}
+
+// ── Service Worker ─────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
