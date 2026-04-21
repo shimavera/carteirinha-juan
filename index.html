@@ -19,34 +19,26 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --purple:      #6D28D9;
-      --purple-dark: #4C1D95;
-      --blue:        #1D4ED8;
-      --blue-dark:   #1E3A8A;
-      --bg:          #F1F5F9;
-      --white:       #FFFFFF;
-      --text:        #0F172A;
-      --text-2:      #64748B;
-      --text-3:      #94A3B8;
-      --border:      #E2E8F0;
-      --green:       #10B981;
-      --shadow-sm:   0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-      --shadow-md:   0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
-      --r-sm: 12px; --r-md: 18px; --r-lg: 24px;
+      --purple:  #6D28D9;
+      --blue:    #1D4ED8;
+      --bg:      #F1F5F9;
+      --white:   #FFFFFF;
+      --text:    #0F172A;
+      --text-2:  #475569;
+      --text-3:  #94A3B8;
+      --border:  #E2E8F0;
+      --green:   #10B981;
+      --sh-sm:   0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+      --sh-md:   0 4px 12px rgba(0,0,0,0.08);
     }
 
-    /* ── Base: bloqueia overflow horizontal completamente ── */
-    html {
+    html, body {
       height: 100%; width: 100%;
       overflow: hidden;
-    }
-    body {
-      height: 100%; width: 100%;
-      overflow: hidden;
-      max-width: 100vw;
-      background: #CBD5E1;
+      touch-action: manipulation;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-font-smoothing: antialiased;
+      background: #CBD5E1;
     }
 
     #app {
@@ -58,193 +50,263 @@
       overflow: hidden;
       background: var(--bg);
       box-shadow: 0 0 60px rgba(0,0,0,0.2);
-      /* clip garante que transforms filhos não vazem */
-      clip-path: inset(0);
     }
 
-    /* ── Screens ── */
-    .screen {
+    /* ── HOME ── */
+    #screen-home {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      width: 100%;
+      inset: 0;
       overflow-y: auto;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
-      will-change: transform;
-      transition: transform 0.36s cubic-bezier(0.4, 0, 0.2, 1);
       background: var(--bg);
+      transition: filter 0.3s;
+      will-change: filter;
     }
-    .screen::-webkit-scrollbar { display: none; }
+    #screen-home.dimmed { filter: brightness(0.65); pointer-events: none; }
+    #screen-home::-webkit-scrollbar { display: none; }
 
-    #screen-home { transform: translateX(0); z-index: 1; }
-    #screen-card { transform: translateX(100%); z-index: 2; }
-    #screen-card.slide-in  { transform: translateX(0); }
-    #screen-home.slide-out { transform: translateX(-28%); }
-
-    /* ══════════════════
-       HOME
-    ══════════════════ */
     .home-wrap {
-      padding-bottom: calc(90px + env(safe-area-inset-bottom, 16px));
+      padding-top: calc(env(safe-area-inset-top, 14px) + 10px);
+      padding-bottom: 32px;
     }
 
-    .home-header {
-      padding: calc(env(safe-area-inset-top, 14px) + 14px) 20px 0;
-    }
+    /* Location bar */
+    .home-header { padding: 0 16px 14px; }
 
-    .location-row {
-      display: flex; align-items: center; gap: 5px;
-      margin-bottom: 6px;
+    .location-bar {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--white);
+      border-radius: 12px;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      box-shadow: var(--sh-sm);
+      margin-bottom: 12px;
+      cursor: pointer;
     }
-    .location-row .dot {
-      width: 6px; height: 6px;
-      background: var(--purple); border-radius: 50%; flex-shrink: 0;
-    }
-    .location-row span {
-      font-size: 13px; font-weight: 500; color: var(--text-2);
-      flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
+    .loc-divider { width: 1px; height: 18px; background: var(--border); flex-shrink: 0; }
+    .loc-text { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
 
     .home-title {
-      font-size: 28px; font-weight: 900; color: var(--text);
-      letter-spacing: -0.7px; line-height: 1.15; margin-bottom: 20px;
+      font-size: 26px; font-weight: 900; color: var(--text);
+      letter-spacing: -0.5px; line-height: 1.2;
     }
 
-    /* Banner */
-    .banner {
-      margin: 0 20px 20px;
-      background: linear-gradient(135deg, var(--purple), var(--purple-dark));
-      border-radius: var(--r-lg);
-      padding: 18px 20px;
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
-      cursor: pointer; position: relative; overflow: hidden;
-      box-shadow: 0 8px 24px rgba(109,40,217,0.35);
+    /* ── Ülife Banner ── */
+    .ulife-banner {
+      margin: 0 16px 14px;
+      border-radius: 18px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: var(--sh-md);
+      cursor: pointer;
+      min-height: 128px;
       transition: transform 0.15s;
     }
-    .banner:active { transform: scale(0.98); }
-    .bb { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.08); }
-    .bb.b1 { width: 110px; height: 110px; top: -30px; right: -20px; }
-    .bb.b2 { width: 70px;  height: 70px;  bottom: -25px; right: 60px; }
-    .banner-left h3 {
-      font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.3px; margin-bottom: 3px;
-    }
-    .banner-left p { font-size: 12px; color: rgba(255,255,255,0.72); font-weight: 500; }
-    .banner-icon {
-      width: 48px; height: 48px; background: rgba(255,255,255,0.18);
-      border-radius: 14px; display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; position: relative; z-index: 1;
+    .ulife-banner:active { transform: scale(0.98); }
+
+    .ulife-left {
+      flex: 1;
+      background: #F8FAFC;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 0 0 8px;
+      overflow: hidden;
     }
 
-    /* Grid */
-    .grid-section { padding: 0 20px; margin-bottom: 14px; }
-    .section-label {
-      font-size: 11px; font-weight: 700; color: var(--text-3);
-      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;
+    .ulife-right {
+      width: 46%;
+      background: linear-gradient(140deg, #7C3AED 0%, #5B21B6 100%);
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
     }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .ulife-right::before {
+      content: '';
+      position: absolute;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      top: -25px; right: -18px;
+    }
+    .ulife-right::after {
+      content: '';
+      position: absolute;
+      width: 55px; height: 55px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      bottom: -14px; left: 8px;
+    }
+
+    .ulife-logo {
+      position: relative; z-index: 1;
+      line-height: 1;
+    }
+    .ulife-logo span { font-size: 38px; font-weight: 900; color: #fff; letter-spacing: -1.5px; }
+    .ulife-logo .u-char { color: #5EEAD4; }
+
+    .ulife-cta {
+      font-size: 11.5px; font-weight: 600;
+      color: rgba(255,255,255,0.88);
+      position: relative; z-index: 1;
+      line-height: 1.4;
+    }
+
+    /* ── Tiles ── */
+    .grid-section { padding: 0 16px; margin-bottom: 14px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     .tile {
-      background: var(--white); border-radius: var(--r-md);
-      padding: 18px 16px 16px; cursor: pointer;
-      display: flex; flex-direction: column; gap: 28px; min-height: 116px;
-      box-shadow: var(--shadow-sm); border: 1px solid rgba(0,0,0,0.04);
-      overflow: hidden; transition: transform 0.15s;
-    }
-    .tile:active { transform: scale(0.96); }
-    .tile.purple {
-      background: linear-gradient(135deg, var(--purple), var(--purple-dark));
-      border-color: transparent;
-      box-shadow: 0 6px 20px rgba(109,40,217,0.3);
-    }
-    .tile.purple .tile-label { color: #fff; }
-    .tile.purple .tile-icon  { color: rgba(255,255,255,0.85); }
-    .tile-label { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.3; }
-    .tile-icon  { align-self: flex-end; color: var(--purple); }
-
-    /* Bottom CTA */
-    .bottom-cta {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 10px 20px;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom, 8px));
-      background: rgba(241,245,249,0.94);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border-top: 1px solid var(--border); z-index: 10;
-    }
-    .btn-primary {
-      width: 100%; background: var(--purple); color: #fff;
-      border: none; border-radius: var(--r-sm); padding: 17px 22px;
-      font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      box-shadow: 0 4px 14px rgba(109,40,217,0.4); letter-spacing: -0.2px;
-      transition: opacity 0.15s, transform 0.15s;
-    }
-    .btn-primary:active { opacity: 0.85; transform: scale(0.98); }
-
-    /* ══════════════════
-       CARTEIRINHA
-    ══════════════════ */
-    .card-wrap {
-      padding-bottom: calc(32px + env(safe-area-inset-bottom, 16px));
-    }
-
-    .card-header {
-      padding: calc(env(safe-area-inset-top, 14px) + 14px) 20px 0;
-      display: flex; align-items: center; gap: 14px; margin-bottom: 6px;
-    }
-    .btn-back {
-      width: 40px; height: 40px; border: 1px solid var(--border);
-      background: var(--white); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: var(--shadow-sm); flex-shrink: 0;
+      background: var(--white);
+      border-radius: 16px;
+      padding: 16px 14px 14px;
+      cursor: pointer;
+      display: flex; flex-direction: column; gap: 22px;
+      min-height: 100px;
+      box-shadow: var(--sh-sm);
+      border: 1px solid rgba(0,0,0,0.04);
       transition: transform 0.15s;
     }
-    .btn-back:active { transform: scale(0.9); }
-    .card-header-title {
-      font-size: 22px; font-weight: 900; color: var(--text); letter-spacing: -0.5px;
-    }
+    .tile:active { transform: scale(0.96); }
+    .tile-label { font-size: 13px; font-weight: 700; color: var(--blue); line-height: 1.3; }
+    .tile-icon  { align-self: flex-end; color: var(--blue); }
 
-    .card-body { padding: 16px 20px 0; }
-
-    .instruction {
-      font-size: 14px; color: var(--text-2); line-height: 1.6; margin-bottom: 20px;
-    }
-    .instruction strong { color: var(--text); font-weight: 700; }
-
-    /* QR Box */
-    .qr-box {
-      background: var(--white); border-radius: var(--r-lg);
-      padding: 22px; display: flex; flex-direction: column;
-      align-items: center; gap: 14px;
-      box-shadow: var(--shadow-md); margin-bottom: 16px;
+    /* ── Minha Carteirinha card ── */
+    .carteirinha-row { padding: 0 16px; margin-bottom: 14px; }
+    .carteirinha-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 18px 18px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: var(--sh-sm);
       border: 1px solid rgba(0,0,0,0.04);
+      cursor: pointer;
+      transition: transform 0.15s;
     }
-    .qr-label {
-      font-size: 11px; font-weight: 700; color: var(--text-3);
-      text-transform: uppercase; letter-spacing: 0.8px;
+    .carteirinha-card:active { transform: scale(0.98); }
+    .carteirinha-icon-wrap {
+      width: 44px; height: 44px;
+      background: #EEF2FF;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
     }
-    #qrcode {
-      display: flex; justify-content: center; align-items: center; min-height: 200px;
-    }
-    #qrcode canvas, #qrcode img { border-radius: 10px; display: block; max-width: 100%; }
+    .carteirinha-label { font-size: 15px; font-weight: 700; color: var(--text); }
 
-    /* Student Card — layout idêntico ao print */
+    /* ── Vivae ad ── */
+    .vivae-ad {
+      margin: 0 16px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #111827;
+      display: flex;
+      min-height: 110px;
+    }
+    .vivae-content {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .vivae-title  { font-size: 13px; font-weight: 800; color: #fff; line-height: 1.4; margin-bottom: 2px; }
+    .vivae-sub    { font-size: 11px; color: rgba(255,255,255,0.65); margin-bottom: 10px; }
+    .vivae-btn {
+      display: inline-flex; align-items: center;
+      background: #fff; border-radius: 20px;
+      padding: 5px 14px; font-size: 12px; font-weight: 700; color: #111827;
+      border: none; cursor: pointer; font-family: inherit; width: fit-content;
+    }
+    .vivae-logos {
+      display: flex; align-items: center; gap: 8px; margin-top: 8px;
+    }
+    .vivae-logos span { font-size: 10px; color: rgba(255,255,255,0.5); font-weight: 600; }
+    .vivae-img {
+      width: 90px;
+      background: linear-gradient(to left, #1F2937, transparent);
+      display: flex; align-items: flex-end; justify-content: center;
+    }
+
+    /* ── SHEET OVERLAY ── */
+    .sheet-overlay {
+      position: absolute;
+      inset: 0;
+      background: transparent;
+      z-index: 50;
+      pointer-events: none;
+      transition: background 0.35s;
+    }
+    .sheet-overlay.active {
+      background: rgba(0,0,0,0.28);
+      pointer-events: auto;
+    }
+
+    /* ── BOTTOM SHEET ── */
+    .bottom-sheet {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      background: var(--white);
+      border-radius: 24px 24px 0 0;
+      z-index: 60;
+      transform: translateY(100%);
+      transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+      max-height: 88dvh;
+      display: flex;
+      flex-direction: column;
+    }
+    .bottom-sheet.open { transform: translateY(0); }
+
+    .sheet-handle-row {
+      padding: 12px 0 6px;
+      display: flex; justify-content: center;
+      flex-shrink: 0;
+    }
+    .sheet-handle {
+      width: 36px; height: 4px;
+      background: #CBD5E1; border-radius: 2px;
+    }
+
+    .sheet-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 4px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+    }
+    .sheet-scroll::-webkit-scrollbar { display: none; }
+
+    .sheet-instruction {
+      font-size: 14px; color: var(--text-2); line-height: 1.6;
+      margin-bottom: 18px; text-align: center;
+    }
+
+    .sheet-qr {
+      display: flex; justify-content: center; align-items: center;
+      margin-bottom: 20px;
+    }
+    #qrcode { display: flex; justify-content: center; }
+    #qrcode canvas, #qrcode img { display: block; max-width: 100%; }
+
+    /* ── Student Card ── */
     .student-card {
       background: #1740C8;
-      border-radius: 16px; padding: 18px 18px 16px;
+      border-radius: 16px;
+      padding: 18px 18px 16px;
       margin-bottom: 14px;
       box-shadow: 0 8px 28px rgba(23,64,200,0.45);
     }
-
-    /* Linha 1: foto + nome instituição */
     .sc-top {
       display: flex; align-items: center;
       justify-content: space-between; margin-bottom: 14px;
     }
-
-    /* Avatar */
     .sc-avatar-wrap {
-      position: relative; width: 60px; height: 60px; flex-shrink: 0; cursor: pointer;
+      position: relative; width: 60px; height: 60px;
+      flex-shrink: 0; cursor: pointer;
     }
     .sc-avatar {
       width: 60px; height: 60px; border-radius: 50%;
@@ -254,319 +316,359 @@
       font-size: 20px; font-weight: 800; color: #fff; overflow: hidden;
     }
     .sc-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-
-    .avatar-cam { display: none; }
-
-    /* Nome da instituição — estilo "sãojudas)" */
     .sc-institution {
       font-size: 17px; font-weight: 700; color: #fff;
       letter-spacing: -0.3px; font-style: italic;
       text-align: right; line-height: 1;
     }
-
-    /* Infos do aluno */
     .sc-name   { font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.3px; margin-bottom: 3px; }
     .sc-course { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 400; margin-bottom: 10px; }
-
-    /* Linha inferior: Aluno + By Santander */
     .sc-bottom {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
     }
-    .sc-aluno {
-      font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 400;
-    }
+    .sc-aluno { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 400; }
     .sc-aluno strong { font-weight: 600; }
-
     .sc-sponsor {
       display: flex; align-items: center; gap: 4px;
-      font-size: 11px; color: rgba(255,255,255,0.75); font-weight: 500; white-space: nowrap;
+      font-size: 11px; color: rgba(255,255,255,0.75);
+      font-weight: 500; white-space: nowrap;
     }
-    .sc-sponsor .santander-flame {
-      width: 14px; height: 14px;
+    .sc-sponsor .flame { width: 14px; height: 14px; }
+
+    /* ── Campus Digital ad ── */
+    .campus-ad {
+      background: linear-gradient(135deg, #DC2626, #991B1B);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .campus-ad-text { flex: 1; }
+    .campus-ad-title { font-size: 13px; font-weight: 800; color: #fff; line-height: 1.3; margin-bottom: 2px; }
+    .campus-ad-sub   { font-size: 11px; color: rgba(255,255,255,0.82); }
+    .campus-ad-icon  {
+      width: 42px; height: 42px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
 
-    /* Validity */
-    .validity-strip {
-      background: var(--white); border-radius: var(--r-sm);
-      padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;
-      box-shadow: var(--shadow-sm); border: 1px solid var(--border);
-    }
-    .validity-left { display: flex; flex-direction: column; gap: 2px; }
-    .validity-label { font-size: 11px; font-weight: 600; color: var(--text-3); }
-    .validity-value { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
-    .validity-right { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; color: var(--green); }
-    .pulse-dot { width: 9px; height: 9px; background: var(--green); border-radius: 50%; animation: pulse 2.2s ease-in-out infinite; }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(0.75); }
+    /* ── QR countdown ring ── */
+    .qr-wrapper { position: relative; display: inline-flex; }
+    .qr-timer {
+      font-size: 11px; font-weight: 700; color: var(--text-3);
+      text-align: center; margin-top: 6px; letter-spacing: 0.3px;
     }
 
-    /* Input foto oculto */
     #photo-input { display: none; }
-
-    /* Hint de toque */
-    .photo-hint { display: none; }
-
     * { -webkit-tap-highlight-color: transparent; }
     button { font-family: inherit; touch-action: manipulation; }
-    /* Bloqueia zoom por double-tap e pinch em todo o app */
-    html { touch-action: manipulation; }
-    #app { touch-action: pan-y; }
   </style>
 </head>
 <body>
 <div id="app">
 
   <!-- HOME -->
-  <div class="screen" id="screen-home">
+  <div id="screen-home">
     <div class="home-wrap">
+
+      <!-- Header -->
       <div class="home-header">
-        <div class="location-row">
-          <div class="dot"></div>
-          <span id="txt-institution-loc">Instituição de Ensino</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <div class="location-bar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+          <div class="loc-divider"></div>
+          <span class="loc-text">USJT - Mooca - 102</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"/>
           </svg>
         </div>
         <h1 class="home-title">Acessos rápidos</h1>
       </div>
 
-      <div class="banner" id="btn-banner">
-        <div class="bb b1"></div><div class="bb b2"></div>
-        <div class="banner-left">
-          <h3>Carteirinha Digital</h3>
-          <p>Acessar minha carteirinha →</p>
-        </div>
-        <div class="banner-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="8.5" cy="11" r="2"/>
-            <path d="M14 10h4M14 13h3"/>
+      <!-- Ülife Banner -->
+      <div class="ulife-banner" id="btn-banner">
+        <div class="ulife-left">
+          <svg viewBox="0 0 138 148" width="138" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- person -->
+            <circle cx="34" cy="38" r="13" fill="#DDD6FE"/>
+            <path d="M18 90 Q23 65 34 62 Q45 65 50 90 L54 118 L43 118 L38 90 L30 90 L25 118 L14 118 Z" fill="#C4B5FD"/>
+            <!-- legs -->
+            <rect x="21" y="112" width="8" height="22" rx="4" fill="#A78BFA"/>
+            <rect x="33" y="112" width="8" height="22" rx="4" fill="#A78BFA"/>
+            <!-- phone body -->
+            <rect x="66" y="18" width="62" height="112" rx="9" fill="#1E293B"/>
+            <rect x="70" y="26" width="54" height="96" rx="5" fill="#F8FAFC"/>
+            <!-- status bar -->
+            <rect x="82" y="20" width="20" height="4" rx="2" fill="#334155"/>
+            <!-- card 1 purple -->
+            <rect x="74" y="32" width="46" height="18" rx="5" fill="#6D28D9"/>
+            <circle cx="81" cy="41" r="5" fill="rgba(255,255,255,0.3)"/>
+            <rect x="89" y="37" width="20" height="3" rx="1.5" fill="rgba(255,255,255,0.8)"/>
+            <rect x="89" y="43" width="14" height="2" rx="1" fill="rgba(255,255,255,0.5)"/>
+            <!-- card 2 blue -->
+            <rect x="74" y="56" width="46" height="18" rx="5" fill="#1D4ED8"/>
+            <circle cx="81" cy="65" r="5" fill="rgba(255,255,255,0.25)"/>
+            <rect x="89" y="61" width="18" height="3" rx="1.5" fill="rgba(255,255,255,0.8)"/>
+            <rect x="89" y="67" width="12" height="2" rx="1" fill="rgba(255,255,255,0.45)"/>
+            <!-- list items -->
+            <rect x="74" y="82" width="46" height="3" rx="1.5" fill="#E2E8F0"/>
+            <rect x="74" y="89" width="36" height="3" rx="1.5" fill="#E2E8F0"/>
+            <rect x="74" y="96" width="42" height="3" rx="1.5" fill="#E2E8F0"/>
+            <rect x="74" y="103" width="28" height="3" rx="1.5" fill="#E2E8F0"/>
+            <!-- home indicator -->
+            <rect x="84" y="128" width="24" height="3" rx="1.5" fill="#94A3B8"/>
           </svg>
+        </div>
+        <div class="ulife-right">
+          <div class="ulife-logo">
+            <span class="u-char">ü</span><span>life</span>
+          </div>
+          <div class="ulife-cta">Acessar a tela principal</div>
         </div>
       </div>
 
+      <!-- 7 tiles -->
       <div class="grid-section">
-        <div class="section-label">Acesso rápido</div>
         <div class="grid">
-          <div class="tile purple" id="btn-tile-card">
-            <span class="tile-label">Minha Carteirinha</span>
+
+          <div class="tile">
+            <span class="tile-label">Minhas UCs</span>
             <div class="tile-icon">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="8.5" cy="11" r="2"/>
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <circle cx="8.5" cy="11" r="2"/>
                 <path d="M14 10h4M14 13h3"/>
               </svg>
             </div>
           </div>
 
           <div class="tile">
-            <span class="tile-label">Histórico de Uso</span>
+            <span class="tile-label">Atendimento</span>
             <div class="tile-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
               </svg>
             </div>
           </div>
 
           <div class="tile">
-            <span class="tile-label">Configurações</span>
+            <span class="tile-label">Buscador de Vagas</span>
             <div class="tile-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
               </svg>
             </div>
           </div>
 
           <div class="tile">
-            <span class="tile-label">Sobre o App</span>
+            <span class="tile-label">Quadro de Aulas</span>
             <div class="tile-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="tile">
+            <span class="tile-label">Conectados</span>
+            <div class="tile-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="8" width="22" height="8" rx="4"/>
+                <circle cx="15" cy="12" r="3" fill="currentColor"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="tile">
+            <span class="tile-label">Meus Pagamentos</span>
+            <div class="tile-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                <path d="M12 6v12M9.5 9.5a3 3 0 1 1 0 5.5"/>
               </svg>
             </div>
           </div>
+
+          <div class="tile">
+            <span class="tile-label">Bibliotecas Online</span>
+            <div class="tile-icon">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+            </div>
+          </div>
+
         </div>
       </div>
-    </div>
 
-    <div class="bottom-cta">
-      <button class="btn-primary" id="btn-cta">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="8.5" cy="11" r="2"/>
-          <path d="M14 10h4M14 13h3"/>
-        </svg>
-        Minha Carteirinha
-      </button>
-    </div>
-  </div>
+      <!-- Minha Carteirinha -->
+      <div class="carteirinha-row">
+        <div class="carteirinha-card" id="btn-carteirinha">
+          <div class="carteirinha-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="3"/>
+              <circle cx="8.5" cy="11" r="2"/>
+              <path d="M14 10h4M14 13h3"/>
+            </svg>
+          </div>
+          <span class="carteirinha-label">Minha Carteirinha</span>
+        </div>
+      </div>
 
-  <!-- CARTEIRINHA -->
-  <div class="screen" id="screen-card">
-    <div class="card-wrap">
-      <div class="card-header">
-        <button class="btn-back" id="btn-back">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"/>
+      <!-- Vivae ad -->
+      <div class="vivae-ad">
+        <div class="vivae-content">
+          <div>
+            <div class="vivae-title">Já pensou em sair da universidade com emprego garantido?</div>
+            <div class="vivae-sub">Com o Vivae, você se destaca no mercado.</div>
+          </div>
+          <div>
+            <button class="vivae-btn">Inscreva-se</button>
+            <div class="vivae-logos">
+              <span>vivae</span>
+              <span>vivo ✦</span>
+              <span>ânima</span>
+              <span>ülife</span>
+            </div>
+          </div>
+        </div>
+        <div class="vivae-img">
+          <svg viewBox="0 0 60 100" width="60" fill="none">
+            <circle cx="30" cy="22" r="14" fill="#374151"/>
+            <path d="M8 100 Q16 65 30 60 Q44 65 52 100 Z" fill="#374151"/>
           </svg>
-        </button>
-        <h2 class="card-header-title">Minha Carteirinha</h2>
-      </div>
-
-      <div class="card-body">
-        <p class="instruction">
-          Apresente esse QR Code ao cobrador ou leitor para utilizar a <strong>meia passagem</strong>.
-        </p>
-
-        <div class="qr-box">
-          <div class="qr-label">QR Code — Meia Passagem</div>
-          <div id="qrcode"></div>
-        </div>
-
-        <div class="student-card">
-          <!-- Linha 1: foto + instituição -->
-          <div class="sc-top">
-            <div class="sc-avatar-wrap" id="avatar-wrap">
-              <div class="sc-avatar" id="sc-avatar">
-                <span id="sc-initials">JL</span>
-              </div>
-              <div class="avatar-cam">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1740C8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                  <circle cx="12" cy="13" r="4"/>
-                </svg>
-              </div>
-            </div>
-            <div class="sc-institution" id="sc-institution">sãojudas)</div>
-          </div>
-
-          <!-- Nome e curso -->
-          <div class="sc-name" id="sc-name">Juan Lourenco</div>
-          <div class="sc-course" id="sc-course">Odontologia</div>
-
-          <!-- Linha inferior: Aluno + By Santander -->
-          <div class="sc-bottom">
-            <div class="sc-aluno">Aluno&nbsp;&nbsp;<strong id="sc-ra">000000</strong></div>
-            <div class="sc-sponsor">
-              By
-              <!-- Chama Santander simplificada -->
-              <svg class="santander-flame" viewBox="0 0 24 24" fill="#FF0000" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C9 6 7 9 9 12c1 1.5 2.5 2 3 4-2-1-4-3-3.5-6C5 13 4 16 6 19c1.5 2.5 4 4 6 4s4.5-1.5 6-4c2-3 1-6-2.5-9 .5 3-1.5 5-3.5 6 .5-2 2-2.5 3-4 2-3 0-6-3-10z"/>
-              </svg>
-              Santander
-            </div>
-          </div>
-
-        </div>
-
-        <div class="validity-strip">
-          <div class="validity-left">
-            <span class="validity-label">Validade</span>
-            <span class="validity-value" id="sc-validity">12/2026</span>
-          </div>
-          <div class="validity-right">
-            <div class="pulse-dot"></div>
-            Válida
-          </div>
         </div>
       </div>
+
     </div>
   </div>
 
-  <!-- Input oculto para foto -->
-  <input type="file" id="photo-input" accept="image/*">
+  <!-- OVERLAY -->
+  <div class="sheet-overlay" id="sheet-overlay"></div>
 
+  <!-- BOTTOM SHEET -->
+  <div class="bottom-sheet" id="bottom-sheet">
+    <div class="sheet-handle-row">
+      <div class="sheet-handle"></div>
+    </div>
+    <div class="sheet-scroll">
+
+      <p class="sheet-instruction">
+        Aponte esse QR Code no leitor da catraca da sua universidade para conseguir entrar no campus.
+      </p>
+
+      <div class="sheet-qr">
+        <div>
+          <div id="qrcode"></div>
+          <p class="qr-timer" id="qr-timer">Atualizando em 10s</p>
+        </div>
+      </div>
+
+      <div class="student-card">
+        <div class="sc-top">
+          <div class="sc-avatar-wrap" id="avatar-wrap">
+            <div class="sc-avatar" id="sc-avatar">
+              <span id="sc-initials">JL</span>
+            </div>
+          </div>
+          <div class="sc-institution" id="sc-institution">sãojudas›</div>
+        </div>
+        <div class="sc-name" id="sc-name">Juan Lourenco</div>
+        <div class="sc-course" id="sc-course">Odontologia</div>
+        <div class="sc-bottom">
+          <div class="sc-aluno">Aluno&nbsp;&nbsp;<strong id="sc-ra">000000</strong></div>
+          <div class="sc-sponsor">
+            By
+            <svg class="flame" viewBox="0 0 24 24" fill="#FF0000">
+              <path d="M12 2C9 6 7 9 9 12c1 1.5 2.5 2 3 4-2-1-4-3-3.5-6C5 13 4 16 6 19c1.5 2.5 4 4 6 4s4.5-1.5 6-4c2-3 1-6-2.5-9 .5 3-1.5 5-3.5 6 .5-2 2-2.5 3-4 2-3 0-6-3-10z"/>
+            </svg>
+            Santander
+          </div>
+        </div>
+      </div>
+
+      <div class="campus-ad">
+        <div class="campus-ad-text">
+          <div class="campus-ad-title">Os melhores benefícios já estão no Campus Digital</div>
+          <div class="campus-ad-sub">Acesse os benefícios exclusivos</div>
+        </div>
+        <div class="campus-ad-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <input type="file" id="photo-input" accept="image/*">
 </div>
 
 <script>
-// ============================================================
-//  CONFIGURAÇÕES
-// ============================================================
 const STUDENT = {
-  name:        'Juan Lourenco',
-  course:      'Odontologia',
-  ra:          '52067346465',
-  institution: 'sãojudas)',
-  validity:    '12/2026',
-  qrData:      'MEIA:52067346465:JUAN.LOURENCO:SP:2026',
+  name:    'Juan Lourenco',
+  course:  'Odontologia',
+  ra:      '52067346465',
+  inst:    'sãojudas›',
 };
-// ============================================================
 
-// Preencher dados
-document.getElementById('txt-institution-loc').textContent = STUDENT.institution;
-document.getElementById('sc-institution').textContent      = STUDENT.institution;
-document.getElementById('sc-name').textContent             = STUDENT.name;
-document.getElementById('sc-course').textContent           = STUDENT.course;
-document.getElementById('sc-ra').textContent               = STUDENT.ra;
-document.getElementById('sc-validity').textContent         = STUDENT.validity;
+// Fill
+document.getElementById('sc-institution').textContent = STUDENT.inst;
+document.getElementById('sc-name').textContent        = STUDENT.name;
+document.getElementById('sc-course').textContent      = STUDENT.course;
+document.getElementById('sc-ra').textContent          = STUDENT.ra;
 
-// Iniciais
 const parts    = STUDENT.name.trim().split(' ').filter(Boolean);
 const initials = parts.length >= 2
   ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
   : parts[0].substring(0, 2).toUpperCase();
 document.getElementById('sc-initials').textContent = initials;
 
-// ── Foto persistida ──────────────────────────────────────
+// Photo
 const avatarEl   = document.getElementById('sc-avatar');
 const photoInput = document.getElementById('photo-input');
 
-function applyPhoto(dataUrl) {
-  avatarEl.innerHTML = `<img src="${dataUrl}" alt="Foto">`;
+function applyPhoto(url) {
+  avatarEl.innerHTML = `<img src="${url}" alt="Foto">`;
 }
+const saved = localStorage.getItem('student_photo');
+if (saved) applyPhoto(saved);
 
-// Carregar foto salva
-const savedPhoto = localStorage.getItem('student_photo');
-if (savedPhoto) applyPhoto(savedPhoto);
-
-// Clicar no avatar abre seletor
-document.getElementById('avatar-wrap').addEventListener('click', () => {
-  photoInput.click();
-});
-
+document.getElementById('avatar-wrap').addEventListener('click', () => photoInput.click());
 photoInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const dataUrl = ev.target.result;
-    localStorage.setItem('student_photo', dataUrl);
-    applyPhoto(dataUrl);
-  };
-  reader.readAsDataURL(file);
-  photoInput.value = ''; // reset para permitir mesmo arquivo de novo
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = (ev) => { localStorage.setItem('student_photo', ev.target.result); applyPhoto(ev.target.result); };
+  r.readAsDataURL(f);
+  photoInput.value = '';
 });
 
-// ── Navegação ────────────────────────────────────────────
-const homeScreen = document.getElementById('screen-home');
-const cardScreen = document.getElementById('screen-card');
-let qrGenerated  = false;
+// QR with 10s rotation
+let qrTimeout = null;
+let countdown = 10;
+let countInterval = null;
 
-function showCard() {
-  homeScreen.classList.add('slide-out');
-  cardScreen.classList.add('slide-in');
-  if (!qrGenerated) { generateQR(); qrGenerated = true; }
-}
-function showHome() {
-  cardScreen.classList.remove('slide-in');
-  homeScreen.classList.remove('slide-out');
+function getQRData() {
+  const token = Math.floor(Date.now() / 10000);
+  return `MEIA:${STUDENT.ra}:JUAN.LOURENCO:SP:2026:${token}`;
 }
 
-document.getElementById('btn-banner').addEventListener('click', showCard);
-document.getElementById('btn-tile-card').addEventListener('click', showCard);
-document.getElementById('btn-cta').addEventListener('click', showCard);
-document.getElementById('btn-back').addEventListener('click', showHome);
-
-// ── QR Code ──────────────────────────────────────────────
 function generateQR() {
   const el   = document.getElementById('qrcode');
   el.innerHTML = '';
-  const size = Math.min(window.innerWidth - 84, 240);
+  const size = Math.min(window.innerWidth - 80, 250);
   new QRCode(el, {
-    text:         STUDENT.qrData,
+    text:         getQRData(),
     width:        size,
     height:       size,
     colorDark:    '#0F172A',
@@ -575,11 +677,67 @@ function generateQR() {
   });
 }
 
-// ── Service Worker ───────────────────────────────────────
+function updateTimer() {
+  const el = document.getElementById('qr-timer');
+  if (el) el.textContent = countdown > 1
+    ? `Atualizando em ${countdown}s`
+    : 'Atualizando…';
+}
+
+function scheduleRotation() {
+  const now        = Date.now();
+  const boundary   = (Math.floor(now / 10000) + 1) * 10000;
+  const msUntil    = boundary - now;
+
+  countdown = Math.round(msUntil / 1000);
+  updateTimer();
+
+  clearInterval(countInterval);
+  countInterval = setInterval(() => {
+    countdown = Math.max(0, countdown - 1);
+    updateTimer();
+  }, 1000);
+
+  qrTimeout = setTimeout(() => {
+    generateQR();
+    scheduleRotation();
+  }, msUntil);
+}
+
+function stopRotation() {
+  clearTimeout(qrTimeout);
+  clearInterval(countInterval);
+  qrTimeout = null;
+  countInterval = null;
+}
+
+// Sheet
+const overlay = document.getElementById('sheet-overlay');
+const sheet   = document.getElementById('bottom-sheet');
+const home    = document.getElementById('screen-home');
+
+function openSheet() {
+  overlay.classList.add('active');
+  sheet.classList.add('open');
+  home.classList.add('dimmed');
+  generateQR();
+  scheduleRotation();
+}
+
+function closeSheet() {
+  overlay.classList.remove('active');
+  sheet.classList.remove('open');
+  home.classList.remove('dimmed');
+  stopRotation();
+}
+
+document.getElementById('btn-banner').addEventListener('click', openSheet);
+document.getElementById('btn-carteirinha').addEventListener('click', openSheet);
+overlay.addEventListener('click', closeSheet);
+
+// Service Worker
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  });
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 }
 </script>
 </body>
