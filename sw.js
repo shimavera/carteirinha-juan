@@ -1,4 +1,4 @@
-const CACHE = 'carteirinha-v1';
+const CACHE = 'carteirinha-v2';
 const ASSETS = [
   './',
   './index.html',
