@@ -228,65 +228,68 @@
     }
     #qrcode canvas, #qrcode img { border-radius: 10px; display: block; max-width: 100%; }
 
-    /* Student Card */
+    /* Student Card — layout idêntico ao print */
     .student-card {
-      background: linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 65%, #172554 100%);
-      border-radius: var(--r-lg); padding: 20px;
-      position: relative; overflow: hidden; margin-bottom: 14px;
-      box-shadow: 0 8px 28px rgba(29,78,216,0.4);
+      background: #1740C8;
+      border-radius: 16px; padding: 18px 18px 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 28px rgba(23,64,200,0.45);
     }
-    .sc-orb { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.06); }
-    .sc-orb.o1 { width: 150px; height: 150px; top: -50px; right: -40px; }
-    .sc-orb.o2 { width: 100px; height: 100px; bottom: -40px; left: 10px; }
 
+    /* Linha 1: foto + nome instituição */
     .sc-top {
-      display: flex; justify-content: space-between;
-      align-items: flex-start; margin-bottom: 14px; position: relative;
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 14px;
     }
 
-    /* Avatar com suporte a foto */
+    /* Avatar */
     .sc-avatar-wrap {
-      position: relative; width: 58px; height: 58px; flex-shrink: 0; cursor: pointer;
+      position: relative; width: 60px; height: 60px; flex-shrink: 0; cursor: pointer;
     }
     .sc-avatar {
-      width: 58px; height: 58px; border-radius: 50%;
-      background: rgba(255,255,255,0.18);
-      border: 2.5px solid rgba(255,255,255,0.45);
+      width: 60px; height: 60px; border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.5);
       display: flex; align-items: center; justify-content: center;
-      font-size: 19px; font-weight: 800; color: #fff; letter-spacing: -1px;
-      overflow: hidden;
+      font-size: 20px; font-weight: 800; color: #fff; overflow: hidden;
     }
-    .sc-avatar img {
-      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
-    }
-    /* Botão câmera sobre o avatar */
+    .sc-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
     .avatar-cam {
-      position: absolute; bottom: -2px; right: -2px;
+      position: absolute; bottom: 0; right: 0;
       width: 22px; height: 22px; border-radius: 50%;
-      background: #fff; border: 2px solid rgba(255,255,255,0.6);
+      background: #fff; border: 2px solid #1740C8;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     }
 
+    /* Nome da instituição — estilo "sãojudas)" */
     .sc-institution {
-      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 10px; padding: 7px 11px; font-size: 10px; font-weight: 800;
-      color: rgba(255,255,255,0.92); text-align: right;
-      max-width: 140px; line-height: 1.4; letter-spacing: 0.2px;
+      font-size: 17px; font-weight: 700; color: #fff;
+      letter-spacing: -0.3px; font-style: italic;
+      text-align: right; line-height: 1;
     }
 
-    .sc-body { position: relative; }
-    .meia-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.28);
-      border-radius: 20px; padding: 4px 11px; font-size: 10px; font-weight: 800;
-      color: rgba(255,255,255,0.88); text-transform: uppercase;
-      letter-spacing: 0.6px; margin-bottom: 10px;
+    /* Infos do aluno */
+    .sc-name   { font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.3px; margin-bottom: 3px; }
+    .sc-course { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 400; margin-bottom: 10px; }
+
+    /* Linha inferior: Aluno + By Santander */
+    .sc-bottom {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
     }
-    .sc-name  { font-size: 19px; font-weight: 800; color: #fff; letter-spacing: -0.4px; line-height: 1.2; margin-bottom: 5px; }
-    .sc-course{ font-size: 13px; color: rgba(255,255,255,0.65); font-weight: 500; margin-bottom: 5px; }
-    .sc-ra    { font-size: 12px; color: rgba(255,255,255,0.55); font-weight: 500; }
-    .sc-ra strong { color: rgba(255,255,255,0.82); font-weight: 700; }
+    .sc-aluno {
+      font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 400;
+    }
+    .sc-aluno strong { font-weight: 600; }
+
+    .sc-sponsor {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px; color: rgba(255,255,255,0.75); font-weight: 500; white-space: nowrap;
+    }
+    .sc-sponsor .santander-flame {
+      width: 14px; height: 14px;
+    }
 
     /* Validity */
     .validity-strip {
@@ -433,40 +436,45 @@
         </div>
 
         <div class="student-card">
-          <div class="sc-orb o1"></div>
-          <div class="sc-orb o2"></div>
+          <!-- Linha 1: foto + instituição -->
           <div class="sc-top">
-            <!-- Avatar clicável para trocar foto -->
             <div class="sc-avatar-wrap" id="avatar-wrap">
               <div class="sc-avatar" id="sc-avatar">
                 <span id="sc-initials">JL</span>
               </div>
               <div class="avatar-cam">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6D28D9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1740C8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                   <circle cx="12" cy="13" r="4"/>
                 </svg>
               </div>
             </div>
-            <div class="sc-institution" id="sc-institution">INSTITUIÇÃO<br>DE ENSINO</div>
+            <div class="sc-institution" id="sc-institution">sãojudas)</div>
           </div>
-          <div class="sc-body">
-            <div class="meia-badge">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
+
+          <!-- Nome e curso -->
+          <div class="sc-name" id="sc-name">Juan Lourenco</div>
+          <div class="sc-course" id="sc-course">Odontologia</div>
+
+          <!-- Linha inferior: Aluno + By Santander -->
+          <div class="sc-bottom">
+            <div class="sc-aluno">Aluno&nbsp;&nbsp;<strong id="sc-ra">000000</strong></div>
+            <div class="sc-sponsor">
+              By
+              <!-- Chama Santander simplificada -->
+              <svg class="santander-flame" viewBox="0 0 24 24" fill="#FF0000" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C9 6 7 9 9 12c1 1.5 2.5 2 3 4-2-1-4-3-3.5-6C5 13 4 16 6 19c1.5 2.5 4 4 6 4s4.5-1.5 6-4c2-3 1-6-2.5-9 .5 3-1.5 5-3.5 6 .5-2 2-2.5 3-4 2-3 0-6-3-10z"/>
               </svg>
-              Meia Passagem
+              Santander
             </div>
-            <div class="sc-name" id="sc-name">Juan Lourenco</div>
-            <div class="sc-course" id="sc-course">Curso</div>
-            <div class="sc-ra">Matrícula <strong id="sc-ra">000000</strong></div>
-            <div class="photo-hint" id="photo-hint">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                <circle cx="12" cy="13" r="4"/>
-              </svg>
-              Toque na foto para alterar
-            </div>
+          </div>
+
+          <div class="photo-hint" id="photo-hint">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            Toque na foto para alterar
           </div>
         </div>
 
@@ -495,21 +503,21 @@
 // ============================================================
 const STUDENT = {
   name:        'Juan Lourenco',
-  course:      'Administração',
-  ra:          '2024001234',
-  institution: 'Universidade Anhembi',
+  course:      'Odontologia',
+  ra:          '52067346465',
+  institution: 'sãojudas)',
   validity:    '12/2026',
-  qrData:      'MEIA:2024001234:JUAN.LOURENCO:SP:2026',
+  qrData:      'MEIA:52067346465:JUAN.LOURENCO:SP:2026',
 };
 // ============================================================
 
 // Preencher dados
 document.getElementById('txt-institution-loc').textContent = STUDENT.institution;
-document.getElementById('sc-institution').innerHTML = STUDENT.institution.replace(' ', '<br>');
-document.getElementById('sc-name').textContent      = STUDENT.name;
-document.getElementById('sc-course').textContent    = STUDENT.course;
-document.getElementById('sc-ra').textContent        = STUDENT.ra;
-document.getElementById('sc-validity').textContent  = STUDENT.validity;
+document.getElementById('sc-institution').textContent      = STUDENT.institution;
+document.getElementById('sc-name').textContent             = STUDENT.name;
+document.getElementById('sc-course').textContent           = STUDENT.course;
+document.getElementById('sc-ra').textContent               = STUDENT.ra;
+document.getElementById('sc-validity').textContent         = STUDENT.validity;
 
 // Iniciais
 const parts    = STUDENT.name.trim().split(' ').filter(Boolean);
