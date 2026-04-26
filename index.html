@@ -322,7 +322,8 @@
       text-align: right; line-height: 1;
     }
     .sc-name   { font-size: 17px; font-weight: 800; color: #fff; letter-spacing: -0.3px; margin-bottom: 3px; }
-    .sc-course { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 400; margin-bottom: 10px; }
+    .sc-course { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 400; margin-bottom: 4px; }
+    .sc-cpf    { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 600; margin-bottom: 10px; letter-spacing: 0.3px; }
     .sc-bottom {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
     }
@@ -613,6 +614,7 @@
         </div>
         <div class="sc-name" id="sc-name">Juan Lourenco</div>
         <div class="sc-course" id="sc-course">Odontologia</div>
+        <div class="sc-cpf" id="sc-cpf">CPF: 000.000.000-00</div>
         <div class="sc-bottom">
           <div class="sc-aluno">Aluno&nbsp;&nbsp;<strong id="sc-ra">000000</strong></div>
           <div class="sc-sponsor">
@@ -665,6 +667,7 @@ const STUDENTS = [
     name:    'Juan Lourenco',
     course:  'Odontologia',
     ra:      '52067346465',
+    cpf:     '445.686.708-61',
     inst:    'sãojudas›',
     qrName:  'JUAN.LOURENCO',
   },
@@ -673,6 +676,7 @@ const STUDENTS = [
     name:    'Joaquina Alves Feitosa',
     course:  'Odontologia',
     ra:      '16518269863',
+    cpf:     '165.182.698-63',
     inst:    'sãojudas›',
     qrName:  'JOAQUINA.FEITOSA',
   },
@@ -702,6 +706,7 @@ function fillCard() {
   document.getElementById('sc-institution').textContent = s.inst;
   document.getElementById('sc-name').textContent        = s.name;
   document.getElementById('sc-course').textContent      = s.course;
+  document.getElementById('sc-cpf').textContent         = 'CPF: ' + s.cpf;
   document.getElementById('sc-ra').textContent          = s.ra;
 
   const avatarEl = document.getElementById('sc-avatar');
