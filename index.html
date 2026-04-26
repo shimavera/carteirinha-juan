@@ -373,7 +373,8 @@
       padding: 13px 4px;
       border-bottom: 1px solid var(--border);
       cursor: pointer;
-      transition: background 0.15s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
       border-radius: 10px;
     }
     .picker-item:last-child { border-bottom: none; }
@@ -403,7 +404,7 @@
 
       <!-- Header -->
       <div class="home-header">
-        <div class="location-bar" id="location-bar">
+        <div class="location-bar" id="location-bar" onclick="openPicker()" style="touch-action:manipulation;">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
           </svg>
@@ -851,12 +852,14 @@ function renderPicker() {
       </div>
       ${i === activeIdx ? '<div class="picker-check">✓</div>' : ''}
     `;
-    item.addEventListener('click', () => {
+    function selectStudent() {
       activeIdx = i;
       localStorage.setItem('active_student', String(i));
       fillCard();
       closePicker();
-    });
+    }
+    item.addEventListener('click', selectStudent);
+    item.addEventListener('touchend', (e) => { e.preventDefault(); selectStudent(); });
     list.appendChild(item);
   });
 }
