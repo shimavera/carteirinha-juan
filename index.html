@@ -362,6 +362,36 @@
     #photo-input { display: none; }
     * { -webkit-tap-highlight-color: transparent; }
     button { font-family: inherit; touch-action: manipulation; }
+
+    /* ── Picker Sheet ── */
+    .picker-title {
+      font-size: 17px; font-weight: 800; color: var(--text);
+      padding: 4px 0 18px; text-align: center;
+    }
+    .picker-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 4px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+      border-radius: 10px;
+    }
+    .picker-item:last-child { border-bottom: none; }
+    .picker-item:active { background: #F1F5F9; }
+    .picker-avatar {
+      width: 44px; height: 44px;
+      background: #EEF2FF;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 800; color: var(--blue);
+      flex-shrink: 0;
+    }
+    .picker-info { flex: 1; min-width: 0; }
+    .picker-name { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .picker-ra   { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+    .picker-check {
+      font-size: 18px; font-weight: 800; color: var(--blue); flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -373,7 +403,7 @@
 
       <!-- Header -->
       <div class="home-header">
-        <div class="location-bar">
+        <div class="location-bar" id="location-bar">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
           </svg>
@@ -610,46 +640,117 @@
     </div>
   </div>
 
+  <!-- PICKER OVERLAY -->
+  <div class="sheet-overlay" id="picker-overlay"></div>
+
+  <!-- PICKER SHEET -->
+  <div class="bottom-sheet" id="picker-sheet">
+    <div class="sheet-handle-row">
+      <div class="sheet-handle"></div>
+    </div>
+    <div class="sheet-scroll">
+      <div class="picker-title">Selecionar Carteirinha</div>
+      <div id="picker-list"></div>
+    </div>
+  </div>
+
   <input type="file" id="photo-input" accept="image/*">
 </div>
 
 <script>
-const STUDENT = {
-  name:    'Juan Lourenco',
-  course:  'Odontologia',
-  ra:      '52067346465',
-  inst:    'sãojudas›',
-};
+const STUDENTS = [
+  {
+    id:      'joaquina',
+    name:    'Joaquina Alves Feitosa',
+    course:  'Odontologia',
+    ra:      '16518269863',
+    inst:    'sãojudas›',
+    qrName:  'JOAQUINA.FEITOSA',
+  },
+  {
+    id:      'juan',
+    name:    'Juan Lourenco',
+    course:  'Odontologia',
+    ra:      '52067346465',
+    inst:    'sãojudas›',
+    qrName:  'JUAN.LOURENCO',
+  },
+];
 
-// Fill
-document.getElementById('sc-institution').textContent = STUDENT.inst;
-document.getElementById('sc-name').textContent        = STUDENT.name;
-document.getElementById('sc-course').textContent      = STUDENT.course;
-document.getElementById('sc-ra').textContent          = STUDENT.ra;
+let activeIdx = parseInt(localStorage.getItem('active_student') || '0', 10);
+if (activeIdx >= STUDENTS.length) activeIdx = 0;
 
-const parts    = STUDENT.name.trim().split(' ').filter(Boolean);
-const initials = parts.length >= 2
-  ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-  : parts[0].substring(0, 2).toUpperCase();
-document.getElementById('sc-initials').textContent = initials;
+function currentStudent() { return STUDENTS[activeIdx]; }
+
+// Migrar foto antiga (chave legada) para o formato novo
+const _oldPhoto = localStorage.getItem('student_photo');
+if (_oldPhoto && !localStorage.getItem('student_photo_juan')) {
+  localStorage.setItem('student_photo_juan', _oldPhoto);
+  localStorage.removeItem('student_photo');
+}
+
+function getInitials(name) {
+  const parts = name.trim().split(' ').filter(Boolean);
+  return parts.length >= 2
+    ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    : parts[0].substring(0, 2).toUpperCase();
+}
+
+function fillCard() {
+  const s = currentStudent();
+  document.getElementById('sc-institution').textContent = s.inst;
+  document.getElementById('sc-name').textContent        = s.name;
+  document.getElementById('sc-course').textContent      = s.course;
+  document.getElementById('sc-ra').textContent          = s.ra;
+
+  const avatarEl = document.getElementById('sc-avatar');
+  const saved    = localStorage.getItem('student_photo_' + s.id);
+  if (saved) {
+    avatarEl.innerHTML = `<img src="${saved}" alt="Foto">`;
+  } else {
+    avatarEl.innerHTML = `<span id="sc-initials">${getInitials(s.name)}</span>`;
+  }
+}
+
+fillCard();
 
 // Photo
-const avatarEl   = document.getElementById('sc-avatar');
 const photoInput = document.getElementById('photo-input');
 
 function applyPhoto(url) {
-  avatarEl.innerHTML = `<img src="${url}" alt="Foto">`;
+  document.getElementById('sc-avatar').innerHTML = `<img src="${url}" alt="Foto">`;
 }
-const saved = localStorage.getItem('student_photo');
-if (saved) applyPhoto(saved);
+
+function compressAndSave(file) {
+  const s = currentStudent();
+  const img = new Image();
+  const blobUrl = URL.createObjectURL(file);
+  img.onload = () => {
+    const MAX = 400;
+    let w = img.width, h = img.height;
+    if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
+    else        { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(blobUrl);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+    try {
+      localStorage.setItem('student_photo_' + s.id, dataUrl);
+    } catch (_) {
+      const smaller = canvas.toDataURL('image/jpeg', 0.4);
+      try { localStorage.setItem('student_photo_' + s.id, smaller); } catch (_) {}
+    }
+    applyPhoto(dataUrl);
+  };
+  img.src = blobUrl;
+}
 
 document.getElementById('avatar-wrap').addEventListener('click', () => photoInput.click());
 photoInput.addEventListener('change', (e) => {
   const f = e.target.files[0];
   if (!f) return;
-  const r = new FileReader();
-  r.onload = (ev) => { localStorage.setItem('student_photo', ev.target.result); applyPhoto(ev.target.result); };
-  r.readAsDataURL(f);
+  compressAndSave(f);
   photoInput.value = '';
 });
 
@@ -659,8 +760,9 @@ let countdown = 10;
 let countInterval = null;
 
 function getQRData() {
+  const s = currentStudent();
   const token = Math.floor(Date.now() / 10000);
-  return `MEIA:${STUDENT.ra}:JUAN.LOURENCO:SP:2026:${token}`;
+  return `MEIA:${s.ra}:${s.qrName}:SP:2026:${token}`;
 }
 
 function generateQR() {
@@ -685,9 +787,9 @@ function updateTimer() {
 }
 
 function scheduleRotation() {
-  const now        = Date.now();
-  const boundary   = (Math.floor(now / 10000) + 1) * 10000;
-  const msUntil    = boundary - now;
+  const now      = Date.now();
+  const boundary = (Math.floor(now / 10000) + 1) * 10000;
+  const msUntil  = boundary - now;
 
   countdown = Math.round(msUntil / 1000);
   updateTimer();
@@ -711,7 +813,7 @@ function stopRotation() {
   countInterval = null;
 }
 
-// Sheet
+// Card Sheet
 const overlay = document.getElementById('sheet-overlay');
 const sheet   = document.getElementById('bottom-sheet');
 const home    = document.getElementById('screen-home');
@@ -731,9 +833,52 @@ function closeSheet() {
   stopRotation();
 }
 
+// Picker Sheet
+const pickerOverlay = document.getElementById('picker-overlay');
+const pickerSheet   = document.getElementById('picker-sheet');
+
+function renderPicker() {
+  const list = document.getElementById('picker-list');
+  list.innerHTML = '';
+  STUDENTS.forEach((s, i) => {
+    const item = document.createElement('div');
+    item.className = 'picker-item';
+    item.innerHTML = `
+      <div class="picker-avatar">${getInitials(s.name)}</div>
+      <div class="picker-info">
+        <div class="picker-name">${s.name}</div>
+        <div class="picker-ra">CPF/RA · ${s.ra}</div>
+      </div>
+      ${i === activeIdx ? '<div class="picker-check">✓</div>' : ''}
+    `;
+    item.addEventListener('click', () => {
+      activeIdx = i;
+      localStorage.setItem('active_student', String(i));
+      fillCard();
+      closePicker();
+    });
+    list.appendChild(item);
+  });
+}
+
+function openPicker() {
+  renderPicker();
+  pickerOverlay.classList.add('active');
+  pickerSheet.classList.add('open');
+  home.classList.add('dimmed');
+}
+
+function closePicker() {
+  pickerOverlay.classList.remove('active');
+  pickerSheet.classList.remove('open');
+  home.classList.remove('dimmed');
+}
+
+document.getElementById('location-bar').addEventListener('click', openPicker);
 document.getElementById('btn-banner').addEventListener('click', openSheet);
 document.getElementById('btn-carteirinha').addEventListener('click', openSheet);
 overlay.addEventListener('click', closeSheet);
+pickerOverlay.addEventListener('click', closePicker);
 
 // Service Worker
 if ('serviceWorker' in navigator) {
